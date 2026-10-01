@@ -1,0 +1,90 @@
+[
+ {
+  "module": "tools",
+  "name": "card_findings",
+  "signature": "(root, reg)",
+  "doc": "Static checks: README present, card matches registry and code, parent README names its sub-modules.",
+  "file": "tools/doc_check.py",
+  "line": 55
+ },
+ {
+  "module": "tools",
+  "name": "resolve_base",
+  "signature": "(root)",
+  "doc": "The commit the work started from: $SOP_BASE, else the merge-base of HEAD with main. Raises if neither resolves.",
+  "file": "tools/doc_check.py",
+  "line": 111
+ },
+ {
+  "module": "tools",
+  "name": "freshness_findings",
+  "signature": "(root, reg, base)",
+  "doc": "A module whose code changed since `base` must also have changed its README, or carry a README waiver.",
+  "file": "tools/doc_check.py",
+  "line": 129
+ },
+ {
+  "module": "tools",
+  "name": "main",
+  "signature": "()",
+  "doc": "",
+  "file": "tools/doc_check.py",
+  "line": 158
+ },
+ {
+  "module": "tools",
+  "name": "section",
+  "signature": "(text, heading, stop_heading)",
+  "doc": "Return the section starting at the line `heading` up to (not including) `stop_heading`, or to EOF.",
+  "file": "tools/sections.py",
+  "line": 5
+ },
+ {
+  "module": "tools",
+  "name": "sop_version",
+  "signature": "(text)",
+  "doc": "Return the '**Version:** x.y.z' value of an SOP, or raise ValueError.",
+  "file": "tools/sections.py",
+  "line": 24
+ },
+ {
+  "module": "tools",
+  "name": "skill_path",
+  "signature": "(root, cls)",
+  "doc": "Return the path of a class's MODULE-standard skill inside its class pack.",
+  "file": "tools/skill_lint.py",
+  "line": 54
+ },
+ {
+  "module": "tools",
+  "name": "lint",
+  "signature": "(path, cls, root)",
+  "doc": "Return a list of violation strings for one SKILL.md.",
+  "file": "tools/skill_lint.py",
+  "line": 59
+ },
+ {
+  "module": "tools",
+  "name": "main",
+  "signature": "(argv)",
+  "doc": "",
+  "file": "tools/skill_lint.py",
+  "line": 92
+ },
+ {
+  "module": "tools",
+  "name": "load_registry",
+  "signature": "(root)",
+  "doc": "Return the parsed modules.toml.",
+  "file": "tools/sop_check.py",
+  "line": 22
+ },
+ {
+  "module": "tools",
+  "name": "check",
+  "signature": "(root, write)",
+  "doc": "Run every structure check. Returns (failures, warnings) as lists of strings.",
+  "file": "tools/sop_check.py",
+  "line": 57
+ }
+]

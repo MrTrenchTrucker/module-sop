@@ -1,0 +1,8 @@
+# Vendored Parrot Protocol class skills (ADR-008). Byte-for-byte copies; never edit here.
+source_repo = "parrot-protocol"
+source_commit = "72d19b82264da78ad6c92b95aff968b6e25d7a63"   # main, merge of PR #3 (v0.2.0)
+
+[files]
+"project-leader/parrot-protocol-project-leader/SKILL.md" = "f85c4c01bf7ce0a76342b44652a46ee1b76af63f0e5a7102e6b215819996c886"
+"itm/parrot-protocol-itm/SKILL.md" = "3f977d58b688f3496a1ba7647a92f4525f204573ec5bdbc83446024f38e08dc5"
+"worker/parrot-protocol-worker/SKILL.md" = "9dd01ffcec4f9de348bcdc3ca6879badc11b453e40f1709f63b059de67e12688"

@@ -1,0 +1,106 @@
+# Module registry (MODULE SOP section 5.2). Scripts check the repo against it: tools/sop_check.py.
+# Changes only via the Interface Change Protocol (section 6.4). Workers edit it only to add a sub-module their IT manager permitted.
+
+[project]
+name = "module-sop"
+line_cap_soft = 300
+line_cap_hard = 500
+architecture_word_budget = 1500
+non_module_dirs = ["decisions", "workorders", "tests", ".sop"]
+
+[modules.docs]
+path = "docs"
+owns = "the Commander's SOP texts, verbatim (MODULE, COMMANDER, PROJECT_LEADER, IT_MANAGER, WORKER)"
+does_not_own = "skills, tooling, any paraphrase or summary of the SOPs"
+depends_on = []
+public = ["MODULE_SOP.md", "COMMANDER_SOP.md", "PROJECT_LEADER_SOP.md", "IT_MANAGER_SOP.md", "WORKER_SOP.md"]
+card = "docs/AGENTS.md"
+line_cap_exempt = true   # ADR-003: the Commander's verbatim text is never split
+
+[modules.tools]
+path = "tools"
+owns = "the gates: the standalone-skill lint (skill_lint), the structure check and its generated files (sop_check), the module docs checks (doc_check)"
+does_not_own = "SOP content (docs), the skill packaging decisions (decisions/), installing skills on agents (agent deployment ops)"
+depends_on = ["docs"]
+public = ["sections.section", "sections.sop_version", "skill_lint.lint", "skill_lint.skill_path", "sop_check.check", "sop_check.load_registry", "doc_check.card_findings", "doc_check.freshness_findings", "doc_check.resolve_base"]
+card = "tools/AGENTS.md"
+
+[modules.skills]
+path = "skills"
+owns = "the class packs, one sub-module per agent class, and the Parrot pin"
+does_not_own = "the rules themselves (docs), hand edits of any kind, the parrot-protocol skills (their own repo)"
+depends_on = ["docs", "tools"]
+public = ["module-sop-project-leader", "parrot-protocol-project-leader", "module-sop-itm", "parrot-protocol-itm", "module-sop-worker", "parrot-protocol-worker"]
+card = "skills/AGENTS.md"
+
+[modules.skills_project_leader]
+path = "skills/project-leader"
+owns = "the Project Leader class pack: its two skills, each a sub-module"
+does_not_own = "any other class's rules; the Project Leader SOP text itself (docs)"
+depends_on = ["skills"]
+public = ["module-sop-project-leader", "parrot-protocol-project-leader"]
+card = "skills/project-leader/AGENTS.md"
+
+[modules.skills_itm]
+path = "skills/itm"
+owns = "the IT Manager class pack: its two skills, each a sub-module"
+does_not_own = "any other class's rules; the IT Manager SOP text itself (docs)"
+depends_on = ["skills"]
+public = ["module-sop-itm", "parrot-protocol-itm"]
+card = "skills/itm/AGENTS.md"
+
+[modules.skills_worker]
+path = "skills/worker"
+owns = "the Worker class pack: its two skills, each a sub-module"
+does_not_own = "any other class's rules; the Worker SOP text itself (docs)"
+depends_on = ["skills"]
+public = ["module-sop-worker", "parrot-protocol-worker"]
+card = "skills/worker/AGENTS.md"
+
+[modules.skills_project_leader_module_sop]
+path = "skills/project-leader/module-sop-project-leader"
+owns = "the standalone Project Leader MODULE-standard skill (module-sop-project-leader): one SKILL.md, authored from docs"
+does_not_own = "the Parrot Protocol (sibling skill), the SOP source text (docs)"
+depends_on = ["skills_project_leader"]
+public = ["module-sop-project-leader"]
+card = "skills/project-leader/module-sop-project-leader/AGENTS.md"
+
+[modules.skills_project_leader_parrot_protocol]
+path = "skills/project-leader/parrot-protocol-project-leader"
+owns = "the vendored Project Leader Parrot Protocol skill (parrot-protocol-project-leader): one SKILL.md, byte-for-byte from parrot-protocol (ADR-008)"
+does_not_own = "any edit (fixes go to the Parrot repo), the MODULE-standard rules (sibling skill)"
+depends_on = ["skills_project_leader"]
+public = ["parrot-protocol-project-leader"]
+card = "skills/project-leader/parrot-protocol-project-leader/AGENTS.md"
+
+[modules.skills_itm_module_sop]
+path = "skills/itm/module-sop-itm"
+owns = "the standalone IT Manager MODULE-standard skill (module-sop-itm): one SKILL.md, authored from docs"
+does_not_own = "the Parrot Protocol (sibling skill), the SOP source text (docs)"
+depends_on = ["skills_itm"]
+public = ["module-sop-itm"]
+card = "skills/itm/module-sop-itm/AGENTS.md"
+
+[modules.skills_itm_parrot_protocol]
+path = "skills/itm/parrot-protocol-itm"
+owns = "the vendored IT Manager Parrot Protocol skill (parrot-protocol-itm): one SKILL.md, byte-for-byte from parrot-protocol (ADR-008)"
+does_not_own = "any edit (fixes go to the Parrot repo), the MODULE-standard rules (sibling skill)"
+depends_on = ["skills_itm"]
+public = ["parrot-protocol-itm"]
+card = "skills/itm/parrot-protocol-itm/AGENTS.md"
+
+[modules.skills_worker_module_sop]
+path = "skills/worker/module-sop-worker"
+owns = "the standalone Worker MODULE-standard skill (module-sop-worker): one SKILL.md, authored from docs"
+does_not_own = "the Parrot Protocol (sibling skill), the SOP source text (docs)"
+depends_on = ["skills_worker"]
+public = ["module-sop-worker"]
+card = "skills/worker/module-sop-worker/AGENTS.md"
+
+[modules.skills_worker_parrot_protocol]
+path = "skills/worker/parrot-protocol-worker"
+owns = "the vendored Worker Parrot Protocol skill (parrot-protocol-worker): one SKILL.md, byte-for-byte from parrot-protocol (ADR-008)"
+does_not_own = "any edit (fixes go to the Parrot repo), the MODULE-standard rules (sibling skill)"
+depends_on = ["skills_worker"]
+public = ["parrot-protocol-worker"]
+card = "skills/worker/parrot-protocol-worker/AGENTS.md"

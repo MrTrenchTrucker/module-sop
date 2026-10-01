@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+# your own private names for tools/skill_lint.py; never committed
+.sop/private_names.txt
