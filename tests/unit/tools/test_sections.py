@@ -21,6 +21,13 @@ class SectionsTest(unittest.TestCase):
         with self.assertRaises(ValueError):
             section(DOC, '## A', '## Nope')
 
+    def test_heading_with_trailing_space_matches(self):
+        doc = '## A  \nline a\n\n## B\nline b\n'
+        self.assertEqual(section(doc, '## A', '## B'), '## A  \nline a\n')
+
+    def test_heading_on_first_line_needs_no_preceding_newline(self):
+        self.assertEqual(section('## A\nline a\n', '## A'), '## A\nline a\n')
+
     def test_version(self):
         self.assertEqual(sop_version(DOC), '1.2.3')
         with self.assertRaises(ValueError):

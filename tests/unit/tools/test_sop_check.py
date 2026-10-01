@@ -61,6 +61,11 @@ class SopCheckTest(unittest.TestCase):
             f.write('hand edit\n')
         self.assertIn('MODULE_MAP.md is stale or missing (run tools/sop_check.py --write)', check(self.repo)[0])
 
+    def test_relative_import_from_other_module_fails(self):
+        with open(os.path.join(self.repo, 'docs', 'rogue.py'), 'w') as f:
+            f.write('from . import sop_check\n')
+        self.assertTrue(any('docs/rogue.py imports sop_check from module tools' in x for x in check(self.repo)[0]))
+
 
 if __name__ == '__main__':
     unittest.main()

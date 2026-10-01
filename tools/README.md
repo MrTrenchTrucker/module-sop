@@ -21,6 +21,8 @@
   - The same check runs in the test suite (`tests/contract/test_module_docs_current.py`), so whoever changes code sees it
     fail before handing off.
   - The base is the commit the work order started from. The default (the merge-base with main) is right for a branch that carries one work order. On a branch carrying several slices, set `SOP_BASE` to the commit each slice started from; otherwise a later slice rides on an earlier slice's README edit and the check passes when it shouldn't.
-- `sections.py`: the one shared Markdown section reader the other scripts use.
+- `sections.py`: the one shared Markdown section reader the other scripts use. Headings match with trailing
+  whitespace tolerated and need no preceding newline, so editor trimming never fails a gate.
+- `sop_check.py` import contract also covers relative imports (`from . import x` names the sibling).
 
 Every rule each script enforces has a test that plants the fault and watches it fail (`tests/unit/tools/`).

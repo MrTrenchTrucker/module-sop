@@ -45,7 +45,7 @@
   "signature": "(text)",
   "doc": "Return the '**Version:** x.y.z' value of an SOP, or raise ValueError.",
   "file": "tools/sections.py",
-  "line": 24
+  "line": 41
  },
  {
   "module": "tools",

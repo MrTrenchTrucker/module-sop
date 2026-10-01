@@ -92,7 +92,15 @@ def lint(path, cls, root):
 def main(argv):
     args = [a for a in argv if not a.startswith('--')]
     if '--file' in argv:
-        path, cls = argv[argv.index('--file') + 1], argv[argv.index('--class') + 1]
+        try:
+            path = argv[argv.index('--file') + 1]
+            cls = argv[argv.index('--class') + 1]
+        except (ValueError, IndexError):
+            print('usage: tools/skill_lint.py [REPO_ROOT] [--file PATH --class CLASS]', file=sys.stderr)
+            return 2
+        if cls not in CLASSES:
+            print(f'unknown class {cls!r} (one of: {", ".join(CLASSES)})', file=sys.stderr)
+            return 2
         root = args[0] if args and os.path.isdir(os.path.join(args[0], 'docs')) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         targets = [(path, cls)]
     else:
