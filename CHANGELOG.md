@@ -1,6 +1,22 @@
 # Changelog
 
-## [1.2.1] — 2026-09-24 (PR for the Commander's review — IT manager findings on 1.2.0)
+## [1.0.0] — 2026-10-01 (first public release)
+- First release on GitHub. Public version numbers start here; this is the
+  official version from now on.
+- Contents: the five SOPs (MODULE SOP 1.8.1, PROJECT LEADER SOP 1.4.1,
+  IT MANAGER SOP 1.3.1, WORKER SOP 1.3.1, COMMANDER SOP 1.3.0) and the six
+  class skills: `module-sop-<class>` and the vendored `parrot-protocol-<class>`
+  for the project leader, IT manager and worker.
+- Prepared for publication: no private names, hosts or ids anywhere.
+  `tools/skill_lint.py` no longer carries a built-in list of private names;
+  each user lists their own, one per line, in `.sop/private_names.txt`
+  (git-ignored).
+
+## Before the public release
+The entries below record the versions this release was built from. Their
+numbers are pre-release numbers, not public releases.
+
+### Pre-release 1.2.1 — 2026-09-24 (PR for the Commander's review — IT manager findings on 1.2.0)
 - **SOP follow-up, lands only on the Commander's merge.** Versions: MODULE SOP 1.8.1, PROJECT LEADER 1.4.1, IT MANAGER 1.3.1, WORKER 1.3.1; COMMANDER unchanged. The IT manager's findings on 1.2.0:
   - a worker permitted to set up a sub-module has every file the setup writes in its write-scope: the contract test stub, the line in the parent's README that names it, the import contracts, `MODULE_MAP.md` and the function index, not only `modules.toml` and the folder;
   - a *package* folder is one that holds code, not a folder of only test fixtures or data, defined in MODULE SOP 5.2; the IT manager's gate calls a new one a sub-module;
@@ -8,7 +24,7 @@
   - the docs-current check's base is the commit each work order started from.
 - The three `module-sop-<class>` skills mirror it. WO-001 records project setup; the module-nesting-and-docs work (v1.2.0 below) landed with the Commander's merge of PR #1.
 
-## [1.2.0] — 2026-09-24 (same PR, for the Commander's review — module nesting and per-module docs)
+### Pre-release 1.2.0 — 2026-09-24 (same PR, for the Commander's review — module nesting and per-module docs)
 - **SOP amendment, lands only on the Commander's merge.** Versions: MODULE SOP 1.8.0, PROJECT LEADER 1.4.0, IT MANAGER 1.3.0, WORKER 1.3.0; COMMANDER unchanged. Implements his rulings:
   - modules nest to any depth on a folder tree;
   - IT managers create sub-modules at any depth, with notification, setup in the same commit;
@@ -28,7 +44,7 @@
 - **Structure check:** a sub-module must name its direct parent in `depends_on`, at any depth.
 - **This repo meets its own rules:** a README in all 12 module folders, registry `public` lists corrected, internal helpers made private.
 
-## [1.1.0] — 2026-09-24 (PR for the Commander's review)
+### Pre-release 1.1.0 — 2026-09-24 (PR for the Commander's review)
 - **Standalone class skills** (ADR-007 supersedes ADR-001). Each `module-sop-<class>` skill is one self-contained `SKILL.md`:
   - it carries every rule and form its class needs, in the SOP's own words, with no pointers to other documents;
   - its only outside reference is its readback skill;
@@ -41,7 +57,7 @@
   - per-module contract tests;
   - WO-001 in the full work-order form.
 
-## [1.0.0] — 2026-09-24
+### Pre-release 1.0.0 — 2026-09-24
 - Initial import of the Commander's SOP set:
   - MODULE SOP 1.7.0;
   - COMMANDER SOP 1.3.0;
