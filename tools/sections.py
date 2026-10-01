@@ -18,10 +18,10 @@ def section(text, heading, stop_heading=None):
         offs.append(pos)
         pos += len(line) + 1
 
-    def find(tag):
+    def find(tag, lo=0):
         tag = tag.strip()
-        for i, line in enumerate(lines):
-            if line.rstrip() == tag:
+        for i in range(lo, len(lines)):
+            if lines[i].rstrip() == tag:
                 return i
         return None
 
@@ -31,7 +31,10 @@ def section(text, heading, stop_heading=None):
     if stop_heading is None:
         end = len(text)
     else:
-        e = find(stop_heading)
+        # The stop heading must come AFTER the start heading: a stop above
+        # the start (or a repeated heading matched above it) is a renamed
+        # section, which fails loudly instead of returning nothing.
+        e = find(stop_heading, s + 1)
         if e is None:
             raise ValueError(f'stop heading not found: {stop_heading!r}')
         end = offs[e]

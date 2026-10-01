@@ -28,6 +28,13 @@ class SectionsTest(unittest.TestCase):
     def test_heading_on_first_line_needs_no_preceding_newline(self):
         self.assertEqual(section('## A\nline a\n', '## A'), '## A\nline a\n')
 
+    def test_stop_heading_above_start_fails_loudly(self):
+        with self.assertRaises(ValueError):
+            section('## B\nb\n## A\na\n', '## A', '## B')
+
+    def test_repeated_stop_heading_matches_after_start(self):
+        self.assertEqual(section('## X\n## A\na\n## X\nx\n', '## A', '## X'), '## A\na\n')
+
     def test_version(self):
         self.assertEqual(sop_version(DOC), '1.2.3')
         with self.assertRaises(ValueError):

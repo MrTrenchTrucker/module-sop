@@ -24,5 +24,6 @@
 - `sections.py`: the one shared Markdown section reader the other scripts use. Headings match with trailing
   whitespace tolerated and need no preceding newline, so editor trimming never fails a gate.
 - `sop_check.py` import contract also covers relative imports (`from . import x` names the sibling).
+  `from . import *` stays out of scope: unresolvable statically, so it is skipped, not guessed.
 
 Every rule each script enforces has a test that plants the fault and watches it fail (`tests/unit/tools/`).
