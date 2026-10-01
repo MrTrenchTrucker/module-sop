@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+- Tool-gate robustness (no SOP or skill changes):
+  - `sections.section()` tolerates trailing whitespace on heading lines and
+    headings on the first line, so editor trimming never fails a gate.
+  - `sop_check.py` import contract covers relative imports
+    (`from . import x` names the sibling).
+  - `skill_lint.py --file` without `--class` (or with an unknown class) is
+    a usage error (exit 2), not a traceback.
+  - Each fix carries red-arm tests (`tests/unit/tools/`).
+
 ## [1.0.0] — 2026-10-01 (first public release)
 - First release on GitHub. Public version numbers start here; this is the
   official version from now on.

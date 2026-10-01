@@ -5,20 +5,40 @@ import re
 def section(text, heading, stop_heading=None):
     """Return the section starting at the line `heading` up to (not including) `stop_heading`, or to EOF.
 
-    Raises ValueError if a heading is missing, so a renamed section fails loudly instead of returning nothing.
+    Heading lines match with trailing whitespace tolerated, and a heading
+    on the first line needs no preceding newline — an editor trimming
+    spaces must never fail a gate. Raises ValueError if a heading is
+    missing, so a renamed section fails loudly instead of returning nothing.
     """
-    start = text.find('\n' + heading + '\n')
-    if start < 0:
+    want = heading.strip()
+    lines = text.split('\n')
+    offs = []
+    pos = 0
+    for line in lines:
+        offs.append(pos)
+        pos += len(line) + 1
+
+    def find(tag, lo=0):
+        tag = tag.strip()
+        for i in range(lo, len(lines)):
+            if lines[i].rstrip() == tag:
+                return i
+        return None
+
+    s = find(want)
+    if s is None:
         raise ValueError(f'heading not found: {heading!r}')
-    start += 1
     if stop_heading is None:
         end = len(text)
     else:
-        end = text.find('\n' + stop_heading + '\n', start)
-        if end < 0:
+        # The stop heading must come AFTER the start heading: a stop above
+        # the start (or a repeated heading matched above it) is a renamed
+        # section, which fails loudly instead of returning nothing.
+        e = find(stop_heading, s + 1)
+        if e is None:
             raise ValueError(f'stop heading not found: {stop_heading!r}')
-        end += 1
-    return text[start:end].rstrip('\n') + '\n'
+        end = offs[e]
+    return text[offs[s]:end].rstrip('\n') + '\n'
 
 
 def sop_version(text):

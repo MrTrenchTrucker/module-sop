@@ -91,6 +91,14 @@ class SkillLintTest(unittest.TestCase):
         v = self.run_lint(CLEAN.replace('parrot-protocol-worker', 'the readback skill'))
         self.assertTrue(any(x.startswith('pairing') for x in v), v)
 
+    def test_file_without_class_is_a_usage_error_not_a_crash(self):
+        from skill_lint import main
+        self.assertEqual(main(['--file', self.p]), 2)
+
+    def test_file_with_unknown_class_is_a_usage_error(self):
+        from skill_lint import main
+        self.assertEqual(main(['--file', self.p, '--class', 'janitor']), 2)
+
     def test_references_folder_is_refused(self):
         os.mkdir(os.path.join(self.d, 'references'))
         v = self.run_lint(CLEAN)
