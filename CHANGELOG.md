@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+- Tool-gate robustness (no SOP or skill changes):
+  - `sections.section()` tolerates trailing whitespace on heading lines and
+    headings on the first line, so editor trimming never fails a gate.
+  - `sop_check.py` import contract covers relative imports
+    (`from . import x` names the sibling).
+  - `skill_lint.py --file` without `--class` (or with an unknown class) is
+    a usage error (exit 2), not a traceback.
+  - `sop_check.py` exempts pytest's cache directory via `non_module_dirs`,
+    so running pytest in a checkout no longer turns the registry gate red.
+  - Each fix carries red-arm tests (`tests/unit/tools/`).
+
 ## [1.0.2] — 2026-10-04
 - Removed the project's own history from the public copy: the setup work
   order, private pull request and commit references, verbatim quotes and

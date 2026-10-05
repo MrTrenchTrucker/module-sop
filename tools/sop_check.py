@@ -123,8 +123,18 @@ def check(root, write=False):
         for fn in local[name]:
             tree = ast.parse(open(os.path.join(root, m['path'], fn + '.py')).read())
             for node in ast.walk(tree):
-                names = [a.name for a in node.names] if isinstance(node, ast.Import) else (
-                    [node.module] if isinstance(node, ast.ImportFrom) and node.module else [])
+                if isinstance(node, ast.Import):
+                    names = [a.name for a in node.names]
+                elif isinstance(node, ast.ImportFrom):
+                    if node.module:
+                        names = [node.module]
+                    elif node.level:
+                        # `from . import x`: x names the sibling module — the dependency.
+                        names = [a.name.split('.')[0] for a in node.names if a.name != '*']
+                    else:
+                        names = []
+                else:
+                    names = []
                 for imp in names:
                     for other, files in local.items():
                         if other != name and other not in m.get('depends_on', []) and imp.split('.')[0] in files:

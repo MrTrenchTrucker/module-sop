@@ -25,6 +25,11 @@ class SopCheckTest(unittest.TestCase):
         os.mkdir(os.path.join(self.repo, 'skills', 'rogue'))
         self.assertIn('unregistered sub-folder: skills/rogue', check(self.repo)[0])
 
+    def test_non_module_dirs_entry_is_exempt(self):
+        os.mkdir(os.path.join(self.repo, '.pytest_cache'))
+        fails, _ = check(self.repo)
+        self.assertEqual(fails, [], 'a dir listed in non_module_dirs must not fail the registry check')
+
     def _set_depends(self, block, value):
         p = os.path.join(self.repo, 'modules.toml')
         text = open(p).read()
@@ -60,6 +65,11 @@ class SopCheckTest(unittest.TestCase):
         with open(os.path.join(self.repo, 'MODULE_MAP.md'), 'a') as f:
             f.write('hand edit\n')
         self.assertIn('MODULE_MAP.md is stale or missing (run tools/sop_check.py --write)', check(self.repo)[0])
+
+    def test_relative_import_from_other_module_fails(self):
+        with open(os.path.join(self.repo, 'docs', 'rogue.py'), 'w') as f:
+            f.write('from . import sop_check\n')
+        self.assertTrue(any('docs/rogue.py imports sop_check from module tools' in x for x in check(self.repo)[0]))
 
 
 if __name__ == '__main__':

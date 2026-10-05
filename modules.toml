@@ -6,7 +6,7 @@ name = "module-sop"
 line_cap_soft = 300
 line_cap_hard = 500
 architecture_word_budget = 1500
-non_module_dirs = ["decisions", "workorders", "tests", ".sop"]
+non_module_dirs = ["decisions", "workorders", "tests", ".sop", ".pytest_cache"]
 
 [modules.docs]
 path = "docs"
