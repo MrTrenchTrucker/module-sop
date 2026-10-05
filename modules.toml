@@ -104,3 +104,11 @@ does_not_own = "any edit (fixes go to the Parrot repo), the MODULE-standard rule
 depends_on = ["skills_worker"]
 public = ["parrot-protocol-worker"]
 card = "skills/worker/parrot-protocol-worker/AGENTS.md"
+
+[modules.adapters]
+path = "adapters"
+owns = "harness adapter packs mapping the SOP chain onto concrete agent harnesses (roles, work-order forms, reply paths)"
+does_not_own = "the SOP texts (docs), the class skills (skills), any harness's own internals"
+depends_on = ["docs"]
+public = ["hermes-bot-mode.md"]
+card = "adapters/AGENTS.md"

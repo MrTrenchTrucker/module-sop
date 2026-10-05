@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+- New `adapters/` module: harness adapter packs mapping the SOP chain onto
+  concrete agent harnesses. First pack: `hermes-bot-mode.md` (Hermes Bot
+  Mode: orchestrator, delegated task workers, reviewer role, kanban
+  work-order form, lazy skill loading). Docs-only; no SOP or skill changes.
+
 ## [1.0.2] — 2026-10-04
 - Removed the project's own history from the public copy: the setup work
   order, private pull request and commit references, verbatim quotes and
