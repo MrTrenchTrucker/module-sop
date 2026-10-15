@@ -3,14 +3,15 @@
 ## What this is
 The Commander's MODULE SOP set, and one agent skill per agent class built from it. The skills are
 installed on every agent as **locked, always-on** skills, next to the matching
-`parrot-protocol-<class>` skill from `parrot-protocol`. That makes two class skills per agent.
+`parrot-protocol-<class>` skill from `parrot-protocol`. That makes two class skills per agent, plus any
+shared skills it uses (`skills/shared/`, ADR-010).
 
 ## Modules
 | Module | Path | Role |
 |---|---|---|
 | docs | `docs/` | The source of truth: the five SOPs, verbatim. |
 | tools | `tools/` | Gates the skills (standalone + faithful), checks structure and module docs, generates the map and index. |
-| skills | `skills/` | The class packs. One sub-module per class (`project-leader`, `itm`, `worker`), each with one sub-module per skill. |
+| skills | `skills/` | The class packs. One sub-module per class (`project-leader`, `itm`, `worker`), each with one sub-module per skill, and the shared pack (`shared`) for skills any class may carry. |
 
 ## Data flow
 ```
@@ -37,6 +38,8 @@ changes since the base  --(tools/doc_check.py, in the test suite)-->  PASS / FAI
 6. **Docs current.** Each card matches the registry and the code (`public` is the whole interface), and a module
    whose code changed has changed its README too, or a work order carries a README waiver. (`doc_check.py`, ADR-009)
 7. **One skill per class**, self-contained. `docs/` is the source and never ships to agents. (ADR-002, ADR-007)
+   **Shared skills** live in `skills/shared/`: standalone, no internal names, no named model or harness, and they name no
+   class skill. (`skill_lint.py`, ADR-010)
 
 ## Who changes what
 - **SOP text:** the Commander only, with a version bump.

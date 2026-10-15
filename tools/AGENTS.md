@@ -11,7 +11,8 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
   - verbatim Quick Reference + One-Paragraph Version;
   - frontmatter name;
   - pairing with `parrot-protocol-<class>`;
-  - no `references/` folder.
+  - no `references/` folder;
+  - shared skills (`skills/shared/`, ADR-010) get the same rules minus fidelity and pairing, and must name no class skill.
 - `sop_check.py`:
   - structure check (registry vs folders, sub-module nesting (a module inside another module's folder must name that direct parent in `depends_on`, at any depth), cards, line caps, word budget, imports);
   - generation of `MODULE_MAP.md` and `.sop/function_index.json`.
@@ -27,6 +28,8 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
 - `sections.sop_version(text) -> str`
 - `skill_lint.lint(path, cls, root) -> list[str]`: violations (empty list = clean).
 - `skill_lint.skill_path(root, cls) -> str`: where the class skill lives.
+- `skill_lint.lint_shared(path, name) -> list[str]`: violations for one shared skill (empty list = clean).
+- `skill_lint.shared_skill_path(root, name) -> str`: where a shared skill lives.
 - `sop_check.check(root, write=False) -> (failures, warnings)`
 - `sop_check.load_registry(root) -> dict`: the parsed `modules.toml`.
 - `doc_check.card_findings(root, reg) -> list[str]`: every module has a card and a README, each card matches the registry and the code, and a parent README names its sub-modules.

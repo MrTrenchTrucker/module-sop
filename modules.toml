@@ -19,18 +19,18 @@ line_cap_exempt = true   # ADR-003: the Commander's verbatim text is never split
 
 [modules.tools]
 path = "tools"
-owns = "the gates: the standalone-skill lint (skill_lint), the structure check and its generated files (sop_check), the module docs checks (doc_check)"
+owns = "the gates: the standalone-skill lint for class and shared skills (skill_lint), the structure check and its generated files (sop_check), the module docs checks (doc_check)"
 does_not_own = "SOP content (docs), the skill packaging decisions (decisions/), installing skills on agents (agent deployment ops)"
 depends_on = ["docs"]
-public = ["sections.section", "sections.sop_version", "skill_lint.lint", "skill_lint.skill_path", "sop_check.check", "sop_check.load_registry", "doc_check.card_findings", "doc_check.freshness_findings", "doc_check.resolve_base"]
+public = ["sections.section", "sections.sop_version", "skill_lint.lint", "skill_lint.skill_path", "skill_lint.lint_shared", "skill_lint.shared_skill_path", "sop_check.check", "sop_check.load_registry", "doc_check.card_findings", "doc_check.freshness_findings", "doc_check.resolve_base"]
 card = "tools/AGENTS.md"
 
 [modules.skills]
 path = "skills"
-owns = "the class packs, one sub-module per agent class, and the Parrot pin"
+owns = "the class packs, one sub-module per agent class, the shared pack (ADR-010), and the Parrot pin"
 does_not_own = "the rules themselves (docs), hand edits of any kind, the parrot-protocol skills (their own repo)"
 depends_on = ["docs", "tools"]
-public = ["module-sop-project-leader", "parrot-protocol-project-leader", "module-sop-itm", "parrot-protocol-itm", "module-sop-worker", "parrot-protocol-worker"]
+public = ["module-sop-project-leader", "parrot-protocol-project-leader", "module-sop-itm", "parrot-protocol-itm", "module-sop-worker", "parrot-protocol-worker", "subagent-plan-file"]
 card = "skills/AGENTS.md"
 
 [modules.skills_project_leader]
@@ -104,3 +104,19 @@ does_not_own = "any edit (fixes go to the Parrot repo), the MODULE-standard rule
 depends_on = ["skills_worker"]
 public = ["parrot-protocol-worker"]
 card = "skills/worker/parrot-protocol-worker/AGENTS.md"
+
+[modules.skills_shared]
+path = "skills/shared"
+owns = "the shared pack: skills any agent class may carry next to its class pack, each a sub-module (ADR-010)"
+does_not_own = "any class's own rules (the class packs), the SOP source text (docs)"
+depends_on = ["skills"]
+public = ["subagent-plan-file"]
+card = "skills/shared/AGENTS.md"
+
+[modules.skills_shared_subagent_plan_file]
+path = "skills/shared/subagent-plan-file"
+owns = "the shared sub-agent plan-file skill (subagent-plan-file): one SKILL.md, gated by tools/skill_lint.py as a shared skill"
+does_not_own = "how a class gates its own work (the class skills), the SOP source text (docs)"
+depends_on = ["skills_shared"]
+public = ["subagent-plan-file"]
+card = "skills/shared/subagent-plan-file/AGENTS.md"

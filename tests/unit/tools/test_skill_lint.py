@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from tests.helpers import ROOT
 from sections import section
-from skill_lint import lint
+from skill_lint import lint, lint_shared
 
 W = open(os.path.join(ROOT, 'docs', 'WORKER_SOP.md')).read()
 CLEAN = ('---\nname: module-sop-worker\ndescription: >-\n  LOCKED, ALWAYS-ON. You are a worker.\n---\n\n'
@@ -94,6 +94,59 @@ class SkillLintTest(unittest.TestCase):
     def test_references_folder_is_refused(self):
         os.mkdir(os.path.join(self.d, 'references'))
         v = self.run_lint(CLEAN)
+        self.assertTrue(any(x.startswith('packaging') for x in v), v)
+
+
+SHARED_CLEAN = ('---\nname: subagent-plan-file\ndescription: >-\n  Use whenever you hand work to a sub-agent.\n---\n\n'
+                '# Sub-Agent Plan File\n\nOne plan file per sub-agent. Read the module card `AGENTS.md` first.\n')
+
+
+class SharedSkillLintTest(unittest.TestCase):
+    """A shared skill gets every standalone rule, but no fidelity or class pairing (ADR-010)."""
+
+    def setUp(self):
+        self.d = tempfile.mkdtemp(prefix='shared-lint-')
+        self.p = os.path.join(self.d, 'SKILL.md')
+
+    def tearDown(self):
+        shutil.rmtree(self.d)
+
+    def run_lint(self, text):
+        open(self.p, 'w').write(text)
+        return lint_shared(self.p, 'subagent-plan-file')
+
+    def test_clean_shared_skill_passes(self):
+        self.assertEqual(self.run_lint(SHARED_CLEAN), [])
+
+    def assertFlags(self, extra, rule):
+        v = self.run_lint(SHARED_CLEAN + extra + '\n')
+        self.assertTrue(any(x.startswith(rule) for x in v), f'tools/skill_lint.py shared rule {rule} did not fire: {v}')
+
+    def test_wrong_name(self):
+        v = self.run_lint(SHARED_CLEAN.replace('name: subagent-plan-file', 'name: plan-file'))
+        self.assertTrue(any(x.startswith('frontmatter') for x in v), v)
+
+    def test_sop_document_pointer(self):
+        self.assertFlags('Read the WORKER SOP first.', 'sop_document')
+
+    def test_section_pointer(self):
+        self.assertFlags('Use the form in Appendix D.', 'section_pointer')
+
+    def test_doc_path(self):
+        self.assertFlags('See references/PLAN.txt.', 'doc_path')
+
+    def test_other_md_file(self):
+        self.assertFlags('Write it to PLAN.md.', 'md_file')
+
+    def test_names_no_model_or_harness(self):
+        self.assertFlags('Tested on Haiku and Claude Code.', 'model_harness')
+
+    def test_names_no_class_skill(self):
+        self.assertFlags('Read back with `parrot-protocol-worker`.', 'pairing')
+
+    def test_references_folder_is_refused(self):
+        os.mkdir(os.path.join(self.d, 'references'))
+        v = self.run_lint(SHARED_CLEAN)
         self.assertTrue(any(x.startswith('packaging') for x in v), v)
 
 

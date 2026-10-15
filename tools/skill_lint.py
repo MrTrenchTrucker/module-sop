@@ -9,6 +9,8 @@ Rules: (1) no pointer to another document (SOP names, sections, appendices, docs
 (3) the class SOP's Quick Reference and One-Paragraph Version appear VERBATIM (the fidelity anchor);
 (4) frontmatter name is the registered skill name; (5) no references/ folder ships with the skill.
 Allowed references: other skills named parrot-protocol-<class>, and the project's own working files.
+Shared skills (skills/shared/, ADR-010) get rules (1), (2), (4) and (5); they have no class SOP, so no fidelity check, and they
+name no class skill and no model, model vendor or agent harness. CLI: tools/skill_lint.py --file PATH --shared NAME.
 """
 import os
 import re
@@ -49,6 +51,13 @@ def _private_names_rule(root):
 
 MD_FILE = re.compile(r'\b[\w./-]+\.md\b')
 SKILL_REF = re.compile(r'\bparrot-protocol-(project-leader|itm|worker)\b')
+CLASS_SKILL = re.compile(r'\b(parrot-protocol|module-sop)-(project-leader|itm|worker)\b')
+FRONTMATTER = re.compile(r'^---\nname: (\S+)\ndescription: >-\n(.+?)\n---\n', re.S)
+# a shared skill names no model, model vendor or agent harness (ADR-010); class skills are not held to this
+MODEL_HARNESS = re.compile(r'\b(Claude|Anthropic|Haiku|Sonnet|Opus|Fable|GPT[-\w.]*|ChatGPT|OpenAI|Gemini|Qwen|Llama|'
+                           r'Mistral|DeepSeek|Nemotron|Hermes|Codex|Cursor|Copilot|Aider)\b')
+# shared skills any class may carry: skill name -> folder under skills/ (ADR-010)
+SHARED = {'subagent-plan-file': 'shared/subagent-plan-file'}
 
 
 def skill_path(root, cls):
@@ -56,16 +65,15 @@ def skill_path(root, cls):
     return os.path.join(root, 'skills', cls, f'module-sop-{cls}', 'SKILL.md')
 
 
-def lint(path, cls, root):
-    """Return a list of violation strings for one SKILL.md."""
-    name, src = CLASSES[cls]
-    text = open(path).read()
+def shared_skill_path(root, name):
+    """Return the path of a shared skill inside the shared pack."""
+    return os.path.join(root, 'skills', *SHARED[name].split('/'), 'SKILL.md')
+
+
+def _line_findings(text, root):
+    """Rules (1) and (2), line by line: pointers to other documents, private names, other .md files."""
     out = []
     rules = RULES + [r for r in (_private_names_rule(root),) if r]
-    m = re.match(r'^---\nname: (\S+)\ndescription: >-\n(.+?)\n---\n', text, re.S)
-    if not m or m.group(1) != name:
-        out.append(f'frontmatter: name must be {name}')
-    body = text[m.end():] if m else text
     for i, line in enumerate(text.splitlines(), 1):
         if i <= 5 and line.startswith('name: '):
             continue
@@ -75,6 +83,42 @@ def lint(path, cls, root):
         for f in MD_FILE.findall(line):
             if f.split('/')[-1] not in ALLOWED_FILES and not re.fullmatch(r'(workorders/WO|decisions/ADR)-[A-Z0-9]+\.md', f):
                 out.append(f'md_file line {i}: {f!r} is not one of the project working files')
+    return out
+
+
+def _packaging(path):
+    if os.path.isdir(os.path.join(os.path.dirname(path), 'references')):
+        return ['packaging: a references/ folder ships with the skill (a standalone skill carries everything in SKILL.md)']
+    return []
+
+
+def lint_shared(path, name, root=None):
+    """Return a list of violation strings for one shared SKILL.md: rules (1), (2), (4), (5), no class skill, model or harness."""
+    root = root or os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    text = open(path).read()
+    out = []
+    m = FRONTMATTER.match(text)
+    if not m or m.group(1) != name:
+        out.append(f'frontmatter: name must be {name}')
+    out += _line_findings(text, root)
+    for i, line in enumerate(text.splitlines(), 1):
+        for hit in MODEL_HARNESS.finditer(line):
+            out.append(f'model_harness line {i}: {hit.group(0)!r}: {line.strip()[:120]}')
+    for hit in sorted(set(CLASS_SKILL.findall(text[m.end():] if m else text))):
+        out.append(f'pairing: a shared skill names no class skill, found {hit[0]}-{hit[1]}')
+    return out + _packaging(path)
+
+
+def lint(path, cls, root):
+    """Return a list of violation strings for one SKILL.md."""
+    name, src = CLASSES[cls]
+    text = open(path).read()
+    out = []
+    m = FRONTMATTER.match(text)
+    if not m or m.group(1) != name:
+        out.append(f'frontmatter: name must be {name}')
+    body = text[m.end():] if m else text
+    out += _line_findings(text, root)
     t = open(os.path.join(root, 'docs', src)).read()
     for h, stop in (('## Quick Reference', '## One-Paragraph Version'), ('## One-Paragraph Version', None)):
         if section(t, h, stop).rstrip('\n') not in body:
@@ -84,25 +128,28 @@ def lint(path, cls, root):
         out.append(f'pairing: the skill must name its readback skill `{want}`')
     for ref in set(SKILL_REF.findall(body)) - {cls}:
         out.append(f'pairing: names another class\'s skill parrot-protocol-{ref}')
-    if os.path.isdir(os.path.join(os.path.dirname(path), 'references')):
-        out.append('packaging: a references/ folder ships with the skill (a standalone skill carries everything in SKILL.md)')
-    return out
+    return out + _packaging(path)
 
 
 def main(argv):
     args = [a for a in argv if not a.startswith('--')]
-    if '--file' in argv:
+    if '--file' in argv and '--shared' in argv:
+        path, name = argv[argv.index('--file') + 1], argv[argv.index('--shared') + 1]
+        args = [a for a in args if a not in (path, name)]
+        root = args[0] if args else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        targets = [(path, 'shared', name)]
+    elif '--file' in argv:
         path, cls = argv[argv.index('--file') + 1], argv[argv.index('--class') + 1]
         root = args[0] if args and os.path.isdir(os.path.join(args[0], 'docs')) else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        targets = [(path, cls)]
+        targets = [(path, cls, None)]
     else:
         root = args[0] if args else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        targets = [(skill_path(root, c), c) for c in CLASSES]
+        targets = [(skill_path(root, c), c, None) for c in CLASSES] + [(shared_skill_path(root, n), 'shared', n) for n in SHARED]
     bad = 0
-    for path, cls in targets:
-        v = lint(path, cls, root)
+    for path, cls, name in targets:
+        v = lint_shared(path, name, root) if name else lint(path, cls, root)
         size = os.path.getsize(path)
-        print(f'{cls}: {"CLEAN" if not v else f"{len(v)} VIOLATION(S)"}  ({size} bytes)')
+        print(f'{name or cls}: {"CLEAN" if not v else f"{len(v)} VIOLATION(S)"}  ({size} bytes)')
         for x in v:
             print('   ', x)
         bad += len(v)

@@ -53,7 +53,23 @@
   "signature": "(root, cls)",
   "doc": "Return the path of a class's MODULE-standard skill inside its class pack.",
   "file": "tools/skill_lint.py",
-  "line": 54
+  "line": 63
+ },
+ {
+  "module": "tools",
+  "name": "shared_skill_path",
+  "signature": "(root, name)",
+  "doc": "Return the path of a shared skill inside the shared pack.",
+  "file": "tools/skill_lint.py",
+  "line": 68
+ },
+ {
+  "module": "tools",
+  "name": "lint_shared",
+  "signature": "(path, name, root)",
+  "doc": "Return a list of violation strings for one shared SKILL.md: rules (1), (2), (4), (5), no class skill, model or harness.",
+  "file": "tools/skill_lint.py",
+  "line": 95
  },
  {
   "module": "tools",
@@ -61,7 +77,7 @@
   "signature": "(path, cls, root)",
   "doc": "Return a list of violation strings for one SKILL.md.",
   "file": "tools/skill_lint.py",
-  "line": 59
+  "line": 112
  },
  {
   "module": "tools",
@@ -69,7 +85,7 @@
   "signature": "(argv)",
   "doc": "",
   "file": "tools/skill_lint.py",
-  "line": 92
+  "line": 134
  },
  {
   "module": "tools",
