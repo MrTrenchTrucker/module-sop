@@ -50,7 +50,7 @@ No Python function or class is public. The interface is the command line:
 
 ## Known Gotchas
 - `out_dir` and `xlsx_builder` are relative to the folder you run the script from. `plan_file` is relative to `repo`.
-- `module_status.py` (about 365 lines) and `module_status_xlsx.py` (about 331 lines) are over the 300-line soft cap, so
+- `module_status.py` (about 390 lines) and `module_status_xlsx.py` (about 330 lines) are over the 300-line soft cap, so
   `tools/sop_check.py` warns about each. The warnings are acknowledged in the handoff (MODULE SOP 9.1). They are not
   split: the status script is one top-level flow, and a split would move its shared state across files.
 - The example config names a `sample_repo/` folder and an `example_issues.json` that are not shipped (see `README.md`,
