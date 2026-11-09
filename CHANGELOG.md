@@ -4,7 +4,7 @@
 - **New tool: the module status tracker** (`tools/module_status/`, sub-module `tools_module_status`, ADR-011). A script
   that reads a repository's module registry and an optional master plan, and writes a status workbook, a CSV table, a
   JSON file and a report for every module and sub-module.
-  - It only reads. It writes only into the output folder named in its config, never into the repository it reads.
+  - It only reads the repository. It writes only into the output folder named in its config, and warns when that folder is inside the repository.
   - It works on any repository that keeps a `modules.toml` registry. Nothing in it is specific to one project.
   - Rules are fixed and listed in its README. The same inputs always give the same report.
   - GitHub issues are read only when the config asks for them; without that the run is offline.

@@ -305,3 +305,129 @@ class Bugs(Base):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def add_cfg(cfg, *lines):
+    with open(cfg, "a") as fh:
+        fh.write("\n".join(lines) + "\n")
+
+
+def read(path):
+    with open(path, errors="replace") as fh:
+        return fh.read()
+
+
+class Hardening(Base):
+    """Findings of the non-author read: each test pins one promise the card, README or ADR makes."""
+
+    def test_empty_registry_exits_2_with_the_documented_line(self):
+        d, cfg = fixture("# no modules at all\n", [])
+        self.tmp(d)
+        rc, out, err = run(cfg)
+        self.assertEqual(rc, 2, out + err)
+        self.assertIn("CAUTION: the registry lists no modules; nothing to track.", out)
+
+    def test_missing_repo_key_is_a_friendly_exit_2_not_a_traceback(self):
+        d = self.tmp(tempfile.mkdtemp(prefix="module_status_"))
+        cfg = os.path.join(d, "c.toml")
+        with open(cfg, "w") as fh:
+            fh.write('out_dir = "out"\n')
+        rc, out, err = run(cfg)
+        self.assertEqual(rc, 2, out + err)
+        self.assertNotIn("Traceback", err)
+        self.assertIn("no 'repo' key", out)
+
+    def test_unreadable_config_is_exit_2(self):
+        rc, out, err = run("/nonexistent/c.toml")
+        self.assertEqual(rc, 2, out + err)
+        self.assertNotIn("Traceback", err)
+
+    def test_output_folder_inside_the_repo_is_cautioned(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt", "x/src/test/ATest.kt"])
+        self.tmp(d)
+        rc, out, err = run(cfg)
+        self.assertEqual(rc, 0, out + err)
+        self.assertIn("CAUTION output:", out)
+
+    def test_output_folder_outside_the_repo_is_not_cautioned(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt", "x/src/test/ATest.kt"])
+        self.tmp(d)
+        o = self.tmp(tempfile.mkdtemp(prefix="module_status_out_"))
+        with open(cfg, "w") as fh:
+            fh.write(f'repo = "{d}"\nout_dir = "{o}"\nissue_title = "module: {{name}}"\n'
+                     f'issues_json = "{d}/iss.json"\n')
+        rc, out, err = run(cfg)
+        self.assertEqual(rc, 0, out + err)
+        self.assertNotIn("CAUTION output:", out)
+        self.assertTrue(os.path.exists(os.path.join(o, "report.md")))
+
+    def test_proof_path_that_leaves_the_repo_is_ignored_and_cautioned(self):
+        sibling = None
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt", "x/src/test/ATest.kt"])
+        self.tmp(d)
+        sibling = d + "_sibling.txt"
+        with open(sibling, "w") as fh:
+            fh.write("outside the repo")
+        self.addCleanup(os.remove, sibling)
+        with open(os.path.join(d, "PLAN.toml"), "w") as fh:
+            fh.write('[plan.x]\nexpected_subs = []\n[[plan.x.items]]\nname = "outside"\n'
+                     f'proof = ["../{os.path.basename(sibling)}"]\n')
+        add_cfg(cfg, 'plan_file = "PLAN.toml"')
+        rc, out, err = run(cfg)
+        self.assertEqual(rc, 0, out + err)
+        self.assertIn("leaves the repo; ignored", out)
+        self.assertIn("0 of 1 proof paths exist", read(os.path.join(d, "out", "status.json")))
+
+    def test_token_is_never_printed_or_written_to_an_output_file(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt"], github=True)
+        self.tmp(d)
+        with FakeGitHub([]) as url:
+            add_cfg(cfg, f'github_api = "{url}"')
+            rc, out, err = run(cfg, {"GITHUB_TOKEN": "sekret-token-value"})
+        self.assertEqual(rc, 0, out + err)
+        written = "".join(read(os.path.join(d, "out", n)) for n in os.listdir(os.path.join(d, "out"))
+                          if n.endswith((".md", ".json", ".csv")))
+        self.assertNotIn("sekret-token-value", out + err + written)
+
+    def test_token_is_sent_to_loopback_http_as_a_bearer_header(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt"], github=True)
+        self.tmp(d)
+        g = FakeGitHub([])
+        with g as url:
+            add_cfg(cfg, f'github_api = "{url}"')
+            run(cfg, {"GITHUB_TOKEN": "sekret-token-value"})
+        self.assertIn("Bearer sekret-token-value", g.auth)
+
+    def test_token_is_not_sent_over_plain_http_to_another_host(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt"], github=True)
+        self.tmp(d)
+        add_cfg(cfg, 'github_api = "http://host-that-does-not-exist.invalid:9"')
+        rc, out, err = run(cfg, {"GITHUB_TOKEN": "sekret-token-value"})
+        self.assertEqual(rc, 0, out + err)
+        self.assertIn("is not https, so the token is not sent", out)
+        self.assertNotIn("sekret-token-value", out + err)
+
+    def test_token_env_file_is_read_with_an_export_prefix(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt"], github=True)
+        self.tmp(d)
+        envf = os.path.join(d, "tok.env")
+        with open(envf, "w") as fh:
+            fh.write("export MS_TEST_TOKEN='from-file-value'\n")
+        g = FakeGitHub([])
+        with g as url:
+            add_cfg(cfg, f'github_api = "{url}"', f'token_env_file = "{envf}"', 'token_var = "MS_TEST_TOKEN"')
+            rc, out, err = run(cfg, {"MS_TEST_TOKEN": ""})
+        self.assertEqual(rc, 0, out + err)
+        self.assertIn("Bearer from-file-value", g.auth)
+        self.assertNotIn("from-file-value", out + err)
+
+    def test_issue_pager_stops_at_the_cap_with_a_caution(self):
+        d, cfg = fixture(reg_mod("x", "x"), ["x/src/A.kt"], github=True)
+        self.tmp(d)
+        g = FakeGitHub([], mode="endless")
+        with g as url:
+            add_cfg(cfg, f'github_api = "{url}"', "max_issue_pages = 3")
+            rc, out, err = run(cfg, {"GITHUB_TOKEN": "t"})
+        self.assertEqual(rc, 0, out + err)
+        self.assertIn("stopped after 3 pages of issues", out)
+        self.assertEqual(len(g.auth), 3)

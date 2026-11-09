@@ -23,7 +23,15 @@ Exit code: 0 normally, 2 when the registry has no modules at all.
 import csv, glob, json, os, subprocess, sys, tomllib, urllib.error, urllib.parse, urllib.request
 
 cfg_path = sys.argv[1]
-cfg = tomllib.load(open(cfg_path, "rb"))
+try:
+    with open(cfg_path, "rb") as _fh:
+        cfg = tomllib.load(_fh)
+except (OSError, tomllib.TOMLDecodeError) as _e:
+    print(f"CAUTION: cannot read the config '{cfg_path}': {_e}")
+    sys.exit(2)
+if "repo" not in cfg:
+    print("CAUTION: the config has no 'repo' key.")
+    sys.exit(2)
 repo = os.path.expanduser(cfg["repo"])
 out_dir = cfg.get("out_dir", "out")
 os.makedirs(out_dir, exist_ok=True)
@@ -33,6 +41,8 @@ TEST_DIRS = set(cfg.get("test_dirs", ["test", "tests", "androidTest", "testFixtu
 TEST_SUFFIX = tuple(cfg.get("test_suffixes", ["Test.kt", "Tests.kt", "Test.java", "Tests.java", "_test.py",
                                               ".test.js", ".test.ts", ".spec.js", ".spec.ts"]))
 cautions = []
+if os.path.realpath(out_dir).startswith(os.path.realpath(repo) + os.sep):
+    cautions.append(f"CAUTION output: the output folder '{out_dir}' is inside the repo being reported on; the tracker's files will show up as changes there.")
 
 def _load_toml(path, what):
     try:
@@ -161,12 +171,20 @@ elif gh:
             if line.startswith(var + "="):
                 tok = line.split("=", 1)[1].strip().strip("\"'")
     H = {"Accept": "application/vnd.github+json"}
+    _u = urllib.parse.urlparse(api)
+    if tok and _u.scheme != "https" and _u.hostname not in ("127.0.0.1", "localhost", "::1"):
+        cautions.append("CAUTION issues: github_api is not https, so the token is not sent.")
+        tok = ""
     if tok:
         H["Authorization"] = "Bearer " + tok
     else:
         cautions.append("CAUTION issues: no GitHub token found; anonymous calls are limited to 60 an hour.")
     page = 1
+    max_pages = int(cfg.get("max_issue_pages", 100))
     while True:
+        if page > max_pages:
+            cautions.append(f"CAUTION issues: stopped after {max_pages} pages of issues; issue columns may be incomplete.")
+            break
         url = f"{api}/repos/{gh}/issues?" + urllib.parse.urlencode({"state": "all", "per_page": 100, "page": page})
         try:
             with urllib.request.urlopen(urllib.request.Request(url, headers=H), timeout=40) as resp:
@@ -257,6 +275,10 @@ for top in sorted(tops):
         hit = 0
         for p in proofs:
             for x in glob.glob(os.path.join(repo, p)):
+                _rx, _rr = os.path.realpath(x), os.path.realpath(repo)
+                if _rx != _rr and not _rx.startswith(_rr + os.sep):
+                    cautions.append(f"CAUTION {top}: proof path '{p}' leaves the repo; ignored.")
+                    continue
                 if os.path.isfile(x) or (os.path.isdir(x) and any(files for _, _, files in os.walk(x))):
                     hit += 1
                     break

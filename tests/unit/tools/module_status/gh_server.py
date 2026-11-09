@@ -6,10 +6,13 @@ from urllib.parse import parse_qs, urlparse
 class _Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
         page = int(parse_qs(urlparse(self.path).query).get("page", ["1"])[0])
+        self.server.auth.append(self.headers.get("Authorization"))
         if self.server.mode == "403":
             code, body = 403, {"message": "API rate limit exceeded"}
         elif self.server.mode == "not-json":
             code, body = 200, None
+        elif self.server.mode == "endless":
+            code, body = 200, [{"title": f"other {page}", "number": page, "state": "open"}]
         else:
             code, body = 200, (self.server.issues if page == 1 else [])
         data = b"this is not json" if body is None else json.dumps(body).encode()
@@ -24,7 +27,7 @@ class _Handler(http.server.BaseHTTPRequestHandler):
 
 
 class FakeGitHub:
-    """with FakeGitHub(issues, mode) as url: ...   mode: ok | 403 | not-json | down (nothing listens)."""
+    """with FakeGitHub(issues, mode) as url: ...   mode: ok | 403 | not-json | endless (every page is full) | down (nothing listens)."""
 
     def __init__(self, issues=(), mode="ok"):
         self.issues, self.mode = list(issues), mode
@@ -38,6 +41,7 @@ class FakeGitHub:
             return f"http://127.0.0.1:{port}"
         self.server = http.server.ThreadingHTTPServer(("127.0.0.1", 0), _Handler)
         self.server.issues, self.server.mode = self.issues, self.mode
+        self.server.auth = self.auth = []
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
         return f"http://127.0.0.1:{self.server.server_address[1]}"
 

@@ -17,8 +17,8 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
   - structure check (registry vs folders, sub-module nesting (a module inside another module's folder must name that direct parent in `depends_on`, at any depth), cards, line caps, word budget, imports);
   - generation of `MODULE_MAP.md` and `.sop/function_index.json`.
 - `module_status/` (sub-module `tools_module_status`, its own card): the module status tracker. It reads a repo's
-  registry and writes its workbook, CSV table and report into a folder its config names. It never writes into the repo
-  it reads (ADR-011).
+  registry and writes its workbook, CSV table and report into a folder its config names. It writes only into its output folder
+  and warns when that folder is inside the repo it reads (ADR-011).
 
 ## Does Not Own
 - SOP content (module `docs`).

@@ -37,15 +37,15 @@ Exit codes:
 
 - `0`: the run finished. This is also the case when the report has CAUTION or NOTE lines. They are for a
   person to read, not errors.
-- `2`: the registry has no modules at all. The script prints one line (see the CAUTION table) and writes
-  no report. The output folder is still created.
-- `1` (a Python traceback): the config file or the registry file is missing or is not valid TOML, a
-  module has no `path`, or the `plan_file` or `issues_json` file is missing or is not valid. A reply
-  from GitHub that is not JSON is not caught either.
+- `2`: the run cannot start or has nothing to report. The script prints one `CAUTION:` line and writes
+  no report. This covers: the config file is missing or is not valid TOML; the config has no `repo` key;
+  the registry lists no modules at all. In the last case the output folder is still created.
+- `1` (a Python traceback): the registry file is missing or is not valid TOML, a module has no `path`,
+  or the `plan_file` or `issues_json` file is missing or is not valid.
 
 ## Config keys
 
-The config is a TOML file. These are the 19 keys the script reads. Any other key is ignored. Relative
+The config is a TOML file. These are the 20 keys the script reads. Any other key is ignored. Relative
 paths are relative to the folder you run the script from, except `plan_file`, which is relative to `repo`.
 
 | key | default | meaning |
@@ -67,9 +67,10 @@ paths are relative to the folder you run the script from, except `plan_file`, wh
 | `token_env_file` | none | File with lines `VAR=value` (a leading `export ` is allowed). It is read only when the environment variable is empty. |
 | `issues_json` | none | Offline issue list, a JSON object `{"title": [number, "open" or "closed"]}`. When set, `github` is not used. |
 | `issue_title` | `module: {name}` | Title pattern for a top-level module's issue. `{name}` is the last folder name of the module's path; `{key}` is its registry key. |
-| `out_dir` | `out` | Folder for all output files. Created if missing. |
+| `out_dir` | `out` | Folder for all output files. Created if missing. Keep it outside `repo`; a folder inside `repo` gets a CAUTION. |
+| `max_issue_pages` | `100` | The most pages of 100 issues the script reads. When the cap is hit a CAUTION says the issue columns may be incomplete. |
 | `xlsx_name` | `Module_Status.xlsx` | Workbook file name inside `out_dir`. |
-| `xlsx_builder` | `module_status_xlsx.py` next to the script | Script that builds the workbook. It is run as `builder OUT.xlsx STATUS.json --title NAME --asof TIME --sha COMMIT`. |
+| `xlsx_builder` | `module_status_xlsx.py` next to the script | Script that builds the workbook. It is run as `builder OUT.xlsx STATUS.json --title NAME --asof TIME --sha COMMIT`. The script runs this file with the same Python, so point it only at a file you trust. |
 
 ## Registry (modules.toml)
 
@@ -132,8 +133,9 @@ expected_subs = ["alpha"]
   empty page) or `issues_json` (offline). The same matching rules apply to both. Messages say "GitHub" in
   both cases.
 - Token: the environment variable named by `token_var` is used first. If it is empty, `token_env_file`
-  is read. The value is used only in the request header and is never printed. With no token the requests
-  are anonymous, and a CAUTION says so.
+  is read. The value is used only in the request header and is never printed. It is sent only over `https`,
+  or over plain `http` to a loopback address (`127.0.0.1`, `localhost`); for any other `http` address it is
+  not sent and a CAUTION says so. With no token the requests are anonymous, and a CAUTION says so.
 - Matching, top-level modules only (sub-modules have no issue): if the plan gives an `issue` number, that
   number is used. Otherwise the title from `issue_title` is used. If the folder's last name is shared by
   two or more top-level modules and the plan gives no number, nothing is matched.
@@ -221,8 +223,8 @@ The summary table:
 ## Every CAUTION and NOTE line
 
 `{...}` marks a value the script fills in. Lines are listed by what starts them. A CAUTION line is something a
-person should look at. A NOTE line is a fact for the reader. Neither stops the run, except the first line, which
-goes with exit code 2.
+person should look at. A NOTE line is a fact for the reader. Neither stops the run, except the lines marked
+exit code 2.
 
 | exact text | when it is printed |
 |---|---|
@@ -232,6 +234,12 @@ goes with exit code 2.
 | `CAUTION {k}: its registered folder '{path}' does not exist.` | A registered folder is missing. Printed once per module, also for dead modules. |
 | `CAUTION issues: two issues are titled '{title}' (#{old} and #{new}); the newer one is used.` | Two GitHub issues have the same title. The higher number is kept. |
 | `CAUTION issues: no GitHub token found; anonymous calls are limited to 60 an hour.` | `github` is set and no token was found. |
+| `CAUTION issues: github_api is not https, so the token is not sent.` | `github_api` is plain `http` to a host that is not loopback. |
+| `CAUTION issues: stopped after {n} pages of issues; issue columns may be incomplete.` | The issue list ran past `max_issue_pages`. |
+| `CAUTION output: the output folder '{dir}' is inside the repo being reported on; the tracker's files will show up as changes there.` | `out_dir` is inside `repo`. |
+| `CAUTION {top}: proof path '{p}' leaves the repo; ignored.` | A work item's `proof` path points outside `repo` (for example with `..`). |
+| `CAUTION: cannot read the config '{path}': {error}` | The config file is missing or is not valid TOML. Exit code 2. |
+| `CAUTION: the config has no 'repo' key.` | Exit code 2. |
 | `CAUTION issues: could not read issues, GitHub not reachable ({ExceptionName}); issue columns are incomplete.` | The request raised an error, for example `ConnectionError`. |
 | `CAUTION issues: could not read issues, GitHub answered {status}; issue columns are incomplete.` | The answer was not HTTP 200. |
 | `CAUTION {key}: plan issue '{n}' should be a number, not text; read as {int}.` | The plan's `issue` is numeric text. |
@@ -291,6 +299,9 @@ This is the real output of that run (the first part, then the summary table):
 - NOTE parser: registered in the registry but not listed in the master plan file.
 
 No expected_subs list yet (so COMPLETE and ready-to-close checks are off): ingest, parser
+```
+
+The summary table that follows it in the report:
 
 | module | items | done | expected missing | issue | state |
 |---|---|---|---|---|---|
@@ -300,7 +311,6 @@ No expected_subs list yet (so COMPLETE and ready-to-close checks are off): inges
 | parser | 1 | 0 | 0 | no issue | in progress |
 | reporting | 2 | 2 | 0 | #4 open | in progress |
 | future_module | 2 | 0 | 1 | #9 closed | planned |
-```
 
 ## Tests
 

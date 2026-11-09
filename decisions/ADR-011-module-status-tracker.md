@@ -19,7 +19,7 @@
   It has its own card and README, and `tools/README.md` and `tools/AGENTS.md` name it.
 - It reads only: the registry of the repo its config names, the optional master plan, and, when configured, an offline
   issue list or GitHub issues (read-only).
-- It writes only into the output folder its config names (`out_dir`). It never writes into the repo it reads.
+- It writes only into the output folder its config names (`out_dir`). A run whose `out_dir` is inside the repo it reads is allowed but prints a CAUTION.
 - Its interface is its command line. It exposes no Python function or class.
 - Its one network use, an optional read-only HTTPS request for GitHub issues, goes through the standard library
   (`urllib`), so `ARCHITECTURE.md` rule 5 holds without an exception. The API address is configurable

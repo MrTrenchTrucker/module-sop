@@ -15,14 +15,15 @@ status workbook, a CSV table, a JSON file and a text report into the output fold
 ## Does Not Own
 - Checking the repo. The gates (`tools/sop_check.py`, `tools/doc_check.py`, `tools/skill_lint.py`) do that. This module
   only reads the registry and reports on it.
-- Any file in the repo it reads. It never writes there (ADR-011).
+- Any file in the repo it reads. It writes only into its own output folder (ADR-011).
 - GitHub issues: it reads them, and never creates, edits or closes one.
 - The SOP text (`docs`) and the skills (`skills`).
 
 ## Public Interface
 No Python function or class is public. The interface is the command line:
 - `python3 module_status.py CONFIG.toml`: reads the config, writes into the config's `out_dir`, prints the report.
-  Exit 0 normally (CAUTION and NOTE lines are not errors); exit 2 when the registry lists no modules.
+  Exit 0 normally (CAUTION and NOTE lines are not errors); exit 2 when the config is unreadable, has no `repo` key,
+  or the registry lists no modules.
 - `python3 module_status_xlsx.py OUT.xlsx STATUS.json [--title TEXT] [--asof TEXT] [--sha TEXT]`: builds the workbook
   from a status JSON file. Exit 0 on success.
 - Config keys and their defaults: `README.md`, section "Config keys".
@@ -32,11 +33,12 @@ No Python function or class is public. The interface is the command line:
   read of GitHub issues when a config asks for it (ADR-011).
 
 ## Invariants
-- It never writes into the repo it reads. Every output goes into the config's `out_dir` (ADR-011).
+- Every output goes into the config's `out_dir`; it writes nowhere else. If `out_dir` is inside the repo it reads, the
+  report says so in a CAUTION (ADR-011).
 - Its only network use is reading GitHub issues, and only when the config names a GitHub repository. With
   `issues_json` or no issue source, a run is offline.
 - The same inputs give the same output. No model, no randomness, no clock except the "as of" time in the report header.
-- A problem with the inputs is a CAUTION line, not a failure. Exit 2 is the only clean-run refusal (no modules at all).
+- A problem with the inputs is a CAUTION line, not a failure. Exit 2 is the clean-run refusal (unreadable config, no `repo` key, or no modules at all).
 - Every status in the report traces to a rule in `README.md`.
 - Helpers are private (leading underscore), so the public list in the registry stays empty.
 
