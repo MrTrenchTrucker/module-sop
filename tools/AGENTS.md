@@ -16,6 +16,9 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
 - `sop_check.py`:
   - structure check (registry vs folders, sub-module nesting (a module inside another module's folder must name that direct parent in `depends_on`, at any depth), cards, line caps, word budget, imports);
   - generation of `MODULE_MAP.md` and `.sop/function_index.json`.
+- `module_status/` (sub-module `tools_module_status`, its own card): the module status tracker. It reads a repo's
+  registry and writes its workbook, CSV table and report into a folder its config names. It never writes into the repo
+  it reads (ADR-011).
 
 ## Does Not Own
 - SOP content (module `docs`).
@@ -43,6 +46,8 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
 ## Invariants
 - Standard library only (Python 3.11+ for `tomllib`). No network.
 - A missing heading or file raises; it is never silently skipped.
+- The exception to the first line is the sub-module `tools_module_status` (its own card, ADR-011): it reads GitHub issues
+  over the network (standard library only) only when its config names a GitHub repository.
 - Every lint rule has a red-arm test in `tests/unit/tools/test_skill_lint.py`.
 
 ## Test Locations

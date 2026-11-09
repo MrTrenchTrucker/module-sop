@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased]
+- **New tool: the module status tracker** (`tools/module_status/`, sub-module `tools_module_status`, ADR-011). A script
+  that reads a repository's module registry and an optional master plan, and writes a status workbook, a CSV table, a
+  JSON file and a report for every module and sub-module.
+  - It only reads. It writes only into the output folder named in its config, never into the repository it reads.
+  - It works on any repository that keeps a `modules.toml` registry. Nothing in it is specific to one project.
+  - Rules are fixed and listed in its README. The same inputs always give the same report.
+  - GitHub issues are read only when the config asks for them; without that the run is offline.
+  - Tests: unit and regression tests, a contract test, and an offline stand-in for the GitHub client.
+- `tools/AGENTS.md` and `tools/README.md` name the new sub-module.
+- `ARCHITECTURE.md` is unchanged: the tool uses only the standard library, including its optional read of GitHub issues.
+- The five SOP texts and the six class and Parrot skills are unchanged, so installed skills do not need updating.
+
 ## [1.1.0] — 2026-10-15
 - **New shared skill `subagent-plan-file`** in a new shared pack, `skills/shared/` (ADR-010), for any agent that hands
   work to sub-agents. Every sub-agent gets one plan file:

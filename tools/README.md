@@ -23,5 +23,9 @@
     fail before handing off.
   - The base is the commit the work order started from. The default (the merge-base with main) is right for a branch that carries one work order. On a branch carrying several slices, set `SOP_BASE` to the commit each slice started from; otherwise a later slice rides on an earlier slice's README edit and the check passes when it shouldn't.
 - `sections.py`: the one shared Markdown section reader the other scripts use.
+- `module_status/` (sub-module `tools_module_status`, ADR-011): the module status tracker. It reads a repo's
+  `modules.toml` and an optional master plan, and writes a status workbook, a CSV table and a report for every module and
+  sub-module into the folder its config names. It never writes into the repo it reads. Run it with
+  `python3 tools/module_status/module_status.py CONFIG.toml`; see `tools/module_status/README.md`.
 
 Every rule each script enforces has a test that plants the fault and watches it fail (`tests/unit/tools/`).

@@ -1,0 +1,28 @@
+# Master plan for the example. Copy it to sample_repo/MODULE_PLAN.toml (see README.md, "Example").
+[plan.billing]
+issue = 2
+expected_subs = ["invoices", "refunds"]
+
+[[plan.billing.items]]
+name = "invoice export"
+proof = ["apps/billing/invoices/src/invoices.py", "apps/billing/invoices/tests/test_invoices.py"]
+
+[[plan.billing.items]]
+name = "refund flow"
+proof = ["apps/billing/refunds/src/*.py", "apps/billing/refunds/tests/test_*.py"]
+
+[[plan.billing.items]]
+name = "receipts"
+proof = ["apps/billing/invoices/src/invoices.py", "apps/billing/receipts/src/*.py"]
+
+[plan.reporting]
+issue = 4
+expected_subs = ["daily"]
+
+[plan.future_module]
+issue = 9
+expected_subs = ["alpha"]
+
+[plan.archive]
+issue = 5
+expected_subs = []

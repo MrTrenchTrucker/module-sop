@@ -1,0 +1,12 @@
+# Example config for module_status.py. Run it from the folder that holds this file:
+#   python3 /path/to/module_status.py example_config.toml
+name = "Example project"
+repo = "sample_repo"                  # the repository root, relative to the folder you run from
+registry = "modules.toml"             # registry file, relative to repo
+registry_key = "module"               # table holding the modules; "modules" also works
+container_depth = 1                   # one-part paths (apps) only group modules
+plan_file = "MODULE_PLAN.toml"        # master plan, relative to repo
+issues_json = "example_issues.json"   # offline issue titles; to read GitHub instead, set github = "owner/repo" and drop this line
+issue_title = "module: {name}"
+out_dir = "out_example"
+xlsx_name = "Example_Module_Status.xlsx"
