@@ -28,7 +28,7 @@ Each agent carries two class skills: this repo's `module-sop-<class>`, and `parr
   - `ARCHITECTURE.md`: what this is, the modules, the rules.
   - `modules.toml`: the registry.
   - `AGENTS.md` card and `README.md` in every module folder, at every level.
-  - `decisions/`: ADR-001 to ADR-010.
+  - `decisions/`: ADR-001 to ADR-011.
 - **`docs/`** is the Commander's SOP set: the five `*_SOP.md` files, as the Commander wrote or approved them. `docs/AGENTS.md` is that folder's module card, not an SOP, so a byte-for-byte check covers the five SOP files only.
 - **Setup and records:**
   - `APPROVALS.md`, `SMOKE_TEST.md`.

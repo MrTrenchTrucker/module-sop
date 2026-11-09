@@ -102,5 +102,13 @@
   "doc": "Run every structure check. Returns (failures, warnings) as lists of strings.",
   "file": "tools/sop_check.py",
   "line": 57
+ },
+ {
+  "module": "tools_module_status",
+  "name": "main",
+  "signature": "(argv)",
+  "doc": "",
+  "file": "tools/module_status/module_status_xlsx.py",
+  "line": 307
  }
 ]

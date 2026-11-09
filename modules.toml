@@ -25,6 +25,14 @@ depends_on = ["docs"]
 public = ["sections.section", "sections.sop_version", "skill_lint.lint", "skill_lint.skill_path", "skill_lint.lint_shared", "skill_lint.shared_skill_path", "sop_check.check", "sop_check.load_registry", "doc_check.card_findings", "doc_check.freshness_findings", "doc_check.resolve_base"]
 card = "tools/AGENTS.md"
 
+[modules.tools_module_status]
+path = "tools/module_status"
+owns = "the module status tracker: reads a repo's module registry and optional master plan, and writes a status workbook, a CSV table, a JSON file and a report into the output folder its config names"
+does_not_own = "the repo it reads (it never writes there), the gates in tools (sop_check, doc_check, skill_lint), SOP content (docs), skills, creating or closing GitHub issues (it only reads them)"
+depends_on = ["tools"]
+public = []
+card = "tools/module_status/AGENTS.md"
+
 [modules.skills]
 path = "skills"
 owns = "the class packs, one sub-module per agent class, the shared pack (ADR-010), and the Parrot pin"

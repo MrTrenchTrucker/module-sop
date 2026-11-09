@@ -2,6 +2,7 @@
 
 - **docs** `docs` - owns: the Commander's SOP texts, verbatim (MODULE, COMMANDER, PROJECT_LEADER, IT_MANAGER, WORKER) | depends on: none | card: `docs/AGENTS.md`
 - **tools** `tools` - owns: the gates: the standalone-skill lint for class and shared skills (skill_lint), the structure check and its generated files (sop_check), the module docs checks (doc_check) | depends on: docs | card: `tools/AGENTS.md`
+- **tools_module_status** `tools/module_status` - owns: the module status tracker: reads a repo's module registry and optional master plan, and writes a status workbook, a CSV table, a JSON file and a report into the output folder its config names | depends on: tools | card: `tools/module_status/AGENTS.md`
 - **skills** `skills` - owns: the class packs, one sub-module per agent class, the shared pack (ADR-010), and the Parrot pin | depends on: docs, tools | card: `skills/AGENTS.md`
 - **skills_project_leader** `skills/project-leader` - owns: the Project Leader class pack: its two skills, each a sub-module | depends on: skills | card: `skills/project-leader/AGENTS.md`
 - **skills_itm** `skills/itm` - owns: the IT Manager class pack: its two skills, each a sub-module | depends on: skills | card: `skills/itm/AGENTS.md`
