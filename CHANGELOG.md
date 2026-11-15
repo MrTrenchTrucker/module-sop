@@ -1,7 +1,5 @@
 # Changelog
 
-## [Unreleased]
-
 ## [1.2.0] — 2026-11-15
 - **New shared skill `work-labels`** in the shared pack (ADR-012). A work order's state is mirrored on the forge as labels:
   - `status/*`: exactly one, the SOP's twelve status values;
