@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+
+## [1.2.0] — 2026-11-15
 - **New shared skill `work-labels`** in the shared pack (ADR-012). A work order's state is mirrored on the forge as labels:
   - `status/*`: exactly one, the SOP's twelve status values;
   - `lane/A`, `lane/B`, `lane/C`: how the delivery is tested;
@@ -11,7 +13,6 @@
   - It names no model, harness, tool or forge product.
 - `tools/skill_lint.py` gates it as a shared skill (`SHARED` gains `work-labels`). A contract test compares its status
   words with the status values in `docs/MODULE_SOP.md`, so the two cannot drift. Every new test was shown red first.
-- The five SOP texts and the six class and Parrot skills are unchanged, so installed skills do not need updating.
 - **New tool: the module status tracker** (`tools/module_status/`, sub-module `tools_module_status`, ADR-011). A script
   that reads a repository's module registry and an optional master plan, and writes a status workbook, a CSV table, a
   JSON file and a report for every module and sub-module.
