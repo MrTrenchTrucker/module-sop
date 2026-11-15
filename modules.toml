@@ -38,7 +38,7 @@ path = "skills"
 owns = "the class packs, one sub-module per agent class, the shared pack (ADR-010), and the Parrot pin"
 does_not_own = "the rules themselves (docs), hand edits of any kind, the parrot-protocol skills (their own repo)"
 depends_on = ["docs", "tools"]
-public = ["module-sop-project-leader", "parrot-protocol-project-leader", "module-sop-itm", "parrot-protocol-itm", "module-sop-worker", "parrot-protocol-worker", "subagent-plan-file"]
+public = ["module-sop-project-leader", "parrot-protocol-project-leader", "module-sop-itm", "parrot-protocol-itm", "module-sop-worker", "parrot-protocol-worker", "subagent-plan-file", "work-labels"]
 card = "skills/AGENTS.md"
 
 [modules.skills_project_leader]
@@ -118,7 +118,7 @@ path = "skills/shared"
 owns = "the shared pack: skills any agent class may carry next to its class pack, each a sub-module (ADR-010)"
 does_not_own = "any class's own rules (the class packs), the SOP source text (docs)"
 depends_on = ["skills"]
-public = ["subagent-plan-file"]
+public = ["subagent-plan-file", "work-labels"]
 card = "skills/shared/AGENTS.md"
 
 [modules.skills_shared_subagent_plan_file]
@@ -128,3 +128,11 @@ does_not_own = "how a class gates its own work (the class skills), the SOP sourc
 depends_on = ["skills_shared"]
 public = ["subagent-plan-file"]
 card = "skills/shared/subagent-plan-file/AGENTS.md"
+
+[modules.skills_shared_work_labels]
+path = "skills/shared/work-labels"
+owns = "the shared work-labels skill (work-labels): one SKILL.md, gated by tools/skill_lint.py as a shared skill"
+does_not_own = "the work order status values (docs), how a class gates its own work (the class skills), creating labels on a forge (project operations)"
+depends_on = ["skills_shared"]
+public = ["work-labels"]
+card = "skills/shared/work-labels/AGENTS.md"

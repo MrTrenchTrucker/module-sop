@@ -11,5 +11,6 @@ shared pack of skills any class may carry.
   source version and the sha256 of each copy, and a test fails if a copy drifts.
 - `skills_shared` (`shared/`) is the shared pack (ADR-010). Its first skill is `subagent-plan-file`: one plan file per
   sub-agent, with a read gate, a reading certificate, ticked work steps and a closing certificate. It stands alone and
-  names no class skill.
+  names no class skill. Its second skill is `work-labels` (ADR-012): the work order's status, test lane and module
+  mirrored as labels on the forge.
 - Agents get only the `SKILL.md` files, installed read-only; this folder's cards and READMEs stay in the repo.

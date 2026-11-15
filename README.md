@@ -9,6 +9,7 @@ The MODULE SOP set (master + one SOP per class) and one **locked, always-on** sk
 | IT Manager | the IT manager (coding), a second IT manager (bug hunting) | `skills/itm/` (`module-sop-itm`) | `docs/IT_MANAGER_SOP.md` |
 | Worker | one or more workers | `skills/worker/` (`module-sop-worker`) | `docs/WORKER_SOP.md` |
 | Any class that hands work to sub-agents | (shared) | `skills/shared/` (`subagent-plan-file`) | none (ADR-010) |
+| Any class that moves work orders or opens issues and pull requests | (shared) | `skills/shared/` (`work-labels`) | none (ADR-012) |
 
 The master rules every class plays by are in `docs/MODULE_SOP.md`.
 

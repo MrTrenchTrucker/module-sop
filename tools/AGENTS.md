@@ -12,7 +12,7 @@ The deterministic gates: a class skill is standalone and faithful, and the repo'
   - frontmatter name;
   - pairing with `parrot-protocol-<class>`;
   - no `references/` folder;
-  - shared skills (`skills/shared/`, ADR-010) get the same rules minus fidelity and pairing, and must name no class skill.
+  - shared skills (`skills/shared/`, ADR-010) get the same rules minus fidelity and pairing, and must name no class skill. `SHARED` in `skill_lint.py` lists them (`subagent-plan-file`, `work-labels`).
 - `sop_check.py`:
   - structure check (registry vs folders, sub-module nesting (a module inside another module's folder must name that direct parent in `depends_on`, at any depth), cards, line caps, word budget, imports);
   - generation of `MODULE_MAP.md` and `.sop/function_index.json`.
