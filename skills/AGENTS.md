@@ -15,7 +15,7 @@ The packaged agent skills, one sub-module per agent class. Installed on agents a
 - Hand edits: none are allowed.
 
 ## Public Interface
-- Skills `module-sop-project-leader`, `parrot-protocol-project-leader`, `module-sop-itm`, `parrot-protocol-itm`, `module-sop-worker`, `parrot-protocol-worker`, `subagent-plan-file` (frontmatter `name`).
+- Skills `module-sop-project-leader`, `parrot-protocol-project-leader`, `module-sop-itm`, `parrot-protocol-itm`, `module-sop-worker`, `parrot-protocol-worker`, `subagent-plan-file`, `work-labels` (frontmatter `name`).
 
 ## Depends On
 - docs (the source the skills are authored from), tools (the gate)

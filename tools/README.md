@@ -8,7 +8,8 @@
   your own names go one per line in `.sop/private_names.txt`, git-ignored; private addresses and host paths are flagged
   generically), must carry its SOP's Quick Reference and One-Paragraph Version word for word, and must pair
   with `parrot-protocol-<class>`. `skill_lint.py --file <SKILL.md> --shared <name>` gates a shared skill the same way, without
-  the SOP fidelity check, and refuses it if it names a class skill. With no arguments it gates every class and shared skill.
+  the SOP fidelity check, and refuses it if it names a class skill. With no arguments it gates every class and shared skill
+  (`SHARED` lists the shared skills: `subagent-plan-file`, `work-labels`).
 - `sop_check.py [--write]`: the structure check. Every folder is registered, every sub-module sits in its parent's folder and
   depends on it, every card has its sections, files stay under the line caps, imports follow `depends_on`, and the generated
   `MODULE_MAP.md` and `.sop/function_index.json` are current (`--write` regenerates them). It also runs the static docs

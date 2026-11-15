@@ -57,7 +57,7 @@ FRONTMATTER = re.compile(r'^---\nname: (\S+)\ndescription: >-\n(.+?)\n---\n', re
 MODEL_HARNESS = re.compile(r'\b(Claude|Anthropic|Haiku|Sonnet|Opus|Fable|GPT[-\w.]*|ChatGPT|OpenAI|Gemini|Qwen|Llama|'
                            r'Mistral|DeepSeek|Nemotron|Hermes|Codex|Cursor|Copilot|Aider)\b')
 # shared skills any class may carry: skill name -> folder under skills/ (ADR-010)
-SHARED = {'subagent-plan-file': 'shared/subagent-plan-file'}
+SHARED = {'subagent-plan-file': 'shared/subagent-plan-file', 'work-labels': 'shared/work-labels'}
 
 
 def skill_path(root, cls):

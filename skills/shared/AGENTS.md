@@ -5,6 +5,7 @@ The shared pack: skills any agent class may carry, next to its class pack (ADR-0
 
 ## Owns
 - `subagent-plan-file/`: the shared sub-agent plan-file skill (sub-module).
+- `work-labels/`: the shared work-labels skill (sub-module).
 
 ## Does Not Own
 - Any class's own rules (the class packs).
@@ -12,7 +13,7 @@ The shared pack: skills any agent class may carry, next to its class pack (ADR-0
 - The gate (module `tools`).
 
 ## Public Interface
-- Skill `subagent-plan-file` (frontmatter `name`).
+- Skills `subagent-plan-file`, `work-labels` (frontmatter `name`).
 
 ## Depends On
 - skills (parent)
